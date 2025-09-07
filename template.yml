@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Local Lambda Dev with SAM + MySQL
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs22.x
+    MemorySize: 128
+    Architectures:
+      - x86_64
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'http://localhost:5500'"
+      AllowCredentials: true
+Resources:
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common-layer
+      Description: Shared utilities (db, dynamo, env)
+      ContentUri: layers/common
+      CompatibleRuntimes: [nodejs22.x]
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/test/
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+      - !Ref CommonLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /test
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+  CreateQuizFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/createQuiz/
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+        - !Ref CommonLayer
+      Environment:
+        Variables:
+          S3_BUCKET: test-bucket-esc-ky
+          MYSQL_HOST: mysql-quiz
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: mmh-test
+          MYSQL_DATABASE: mw_db
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /quiz
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+  DistributeQuizFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/distributeQuiz/
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+        - !Ref CommonLayer
+      Environment:
+        Variables:
+          S3_BUCKET: test-bucket-esc-ky
+          MYSQL_HOST: mysql-quiz
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: mmh-test
+          MYSQL_DATABASE: mw_db
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /distributeQuiz
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+
+  AnswerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/answerQuiz/
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+        - !Ref CommonLayer
+      Environment:
+        Variables:
+          S3_BUCKET: test-bucket-esc-ky
+          MYSQL_HOST: mysql-quiz
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: mmh-test
+          MYSQL_DATABASE: mw_db
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /quiz/answer
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+  GetQuizFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/getQuiz
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+        - !Ref CommonLayer
+      Environment:
+        Variables:
+          S3_BUCKET: test-bucket-esc-ky
+          MYSQL_HOST: mysql-quiz
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: mmh-test
+          MYSQL_DATABASE: mw_db
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /getQuiz
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+  GetSituationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/getSituation
+      Handler: src/index.handler
+      Runtime: nodejs22.x
+      Layers: 
+        - !Ref CommonLayer
+      Environment:
+        Variables:
+          S3_BUCKET: test-bucket-esc-ky
+          MYSQL_HOST: mysql-quiz
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: mmh-test
+          MYSQL_DATABASE: mw_db
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /getSituation
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+        External:
+          - "@app/common/*"
+
+
+

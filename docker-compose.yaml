@@ -1,0 +1,24 @@
+networks:
+  workflow-net:
+    name: workflow-net
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-quiz
+    restart: always
+    environment:
+      MYSQL_DATABASE: mw_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: mmh-test
+      MYSQL_ROOT_PASSWORD: mmh-test
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      - workflow-net
+volumes:
+  mysql-data:
