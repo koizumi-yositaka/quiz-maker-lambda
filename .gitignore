@@ -1,0 +1,20 @@
+# node_modules（依存ライブラリ）
+**/node_modules/
+cdk/cdk.out/
+
+# TypeScript build artifacts
+**/dist/
+**/*.js
+**/*.js.map
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+
+# dotenv
+.env
+
+.aws-sam/
