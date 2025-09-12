@@ -79,7 +79,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           echo "STAGE: $STAGE"
-          cd ./cdk && npx aws-cdk diff $STAGE/* || true
+          cd ./cdk && npx aws-cdk diff --all || true
       - name: CDK Deploy
         if: github.event_name == 'push'
         run: |
