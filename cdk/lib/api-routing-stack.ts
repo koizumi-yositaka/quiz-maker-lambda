@@ -91,6 +91,12 @@ export class ApiRoutingStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/distributeQuiz/dist')),
     });
 
+    const answerQuizLambda = new lambda.Function(this, 'AnswerQuizLambda', {
+      ...commonLambdaSetting,
+      functionName: `${PREFIX}-answer-quiz-${props.stage}`,
+      code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/answerQuiz/dist')),
+    });
+
     const authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
       cognitoUserPools: [userPool],
       authorizerName: `esc-api-authorizer-${props.stage}`,
@@ -121,10 +127,17 @@ export class ApiRoutingStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    const answerQuiz = api.root.addResource('answerQuiz');
+    answerQuiz.addMethod('POST', new apigateway.LambdaIntegration(answerQuizLambda),{
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     props.s3Bucket.grantRead(getQuizLambda);
     props.s3Bucket.grantWrite(createQuizLambda);
     props.s3Bucket.grantRead(distributeQuizLambda);
     props.s3Bucket.grantWrite(distributeQuizLambda);
+    props.s3Bucket.grantRead(answerQuizLambda);
 
     new cdk.CfnOutput(this, `${PREFIX}-api-url-${props.stage}`, {
       value: api.url,
