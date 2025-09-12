@@ -17,6 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: prod
+    env:
+      AWS_ACCOUNT: 260337063361
+      AWS_REGION: us-east-1
+      DB_HOST:db-cluster-mmh.cluster-cmjvlwsjoinn.us-east-1.rds.amazonaws.com
+      DB_NAME:mw_db
+      DB_USER:admin
+      DB_PASSWORD:mmh-test
+      VPC_ID:vpc-0602b47b
+      LAMBDA_SG_ID:sg-05d40a37b9b87defd
+      USER_POOL_ID:us-east-1_9czkEjLYX
+      SUBNET_ID:subnet-841b2ec9
     steps:
       - uses: actions/checkout@v3
 
