@@ -1,0 +1,80 @@
+name: Deploy CDK Stack
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+  
+
+jobs:
+  deploy:
+    defaults:
+      run:
+        working-directory: ./cdk
+    runs-on: ubuntu-latest
+    environment: 
+      name: prod
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+      - name: Install CDK app deps
+        run: |
+          npm ci
+          
+
+      - name: Build Layers
+        run: |
+          pushd ../layers/common
+          npm install
+          npm run build
+          printf "*\n!nodejs/**\n" > .npmignore
+          popd
+      - name: Build Lambdas
+        run: |
+    
+          cd lambdas/getQuiz && npm install && npm run build && cd ../..
+          cd lambdas/createQuiz && npm install && npm run build && cd ../..
+          cd lambdas/distributeQuiz && npm install && npm run build && cd ../..
+
+      - name: Set STAGE
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.base_ref }}" == "main" ]]; then
+              echo "STAGE=prod" >> $GITHUB_ENV
+            else
+              echo "STAGE=dev" >> $GITHUB_ENV
+            fi
+          else
+            # push イベントなら ref_name から直接取得（main→prod / dev→dev）
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
+              echo "STAGE=prod" >> $GITHUB_ENV
+            else
+              echo "STAGE=dev" >> $GITHUB_ENV
+            fi
+          fi
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: CDK Diff
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "STAGE: $STAGE"
+          npx aws-cdk diff $STAGE/* || true
+      - name: CDK Deploy
+        if: github.event_name == 'push'
+        run: |
+          echo "STAGE: $STAGE"
+          npx aws-cdk deploy $STAGE/* --require-approval never
