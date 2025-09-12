@@ -97,6 +97,12 @@ export class ApiRoutingStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/answerQuiz/dist')),
     });
 
+    const getSituationLambda = new lambda.Function(this, 'GetSituationLambda', {
+      ...commonLambdaSetting,
+      functionName: `${PREFIX}-get-situation-${props.stage}`,
+      code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/getSituation/dist')),
+    });
+
     const authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
       cognitoUserPools: [userPool],
       authorizerName: `esc-api-authorizer-${props.stage}`,
@@ -133,11 +139,18 @@ export class ApiRoutingStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    const getSituation = api.root.addResource('getSituation');
+    getSituation.addMethod('GET', new apigateway.LambdaIntegration(getSituationLambda),{
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     props.s3Bucket.grantRead(getQuizLambda);
     props.s3Bucket.grantWrite(createQuizLambda);
     props.s3Bucket.grantRead(distributeQuizLambda);
     props.s3Bucket.grantWrite(distributeQuizLambda);
     props.s3Bucket.grantRead(answerQuizLambda);
+    props.s3Bucket.grantRead(getSituationLambda);
 
     new cdk.CfnOutput(this, `${PREFIX}-api-url-${props.stage}`, {
       value: api.url,
