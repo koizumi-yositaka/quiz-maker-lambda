@@ -53,13 +53,6 @@ export const handler:Handler = wrap(async(event)=>{
         await conn.query('insert into t_quiz_distribution (quiz_id, email) values ?', [values]);
 
         return ok({ fileKey: `${body.quizId}`,newEmails:newEmails });
-    } catch (err) {
-        if(isHttpError(err)){
-            throw err;
-        }else{
-            console.error("Error creating quiz:", err);
-            throw internal("Internal Server Error", err);
-        }
     } finally {
         if(conn){
             await conn.end();

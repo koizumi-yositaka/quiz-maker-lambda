@@ -41,13 +41,6 @@ export const handler:Handler = wrap(async(event)=>{
 
 
         return ok({rows:rows});
-    } catch (err) {
-        if(isHttpError(err)){
-            throw err;
-        }else{
-            console.error("Error creating quiz:", err);
-            throw internal("Internal Server Error", err);
-        }
     } finally {
         if(conn){
             await conn.end();
