@@ -84,4 +84,4 @@ jobs:
         if: github.event_name == 'push'
         run: |
           echo "STAGE: $STAGE"
-          cd ./cdk && npx aws-cdk deploy $STAGE/* --require-approval never
+          cd ./cdk && npx aws-cdk deploy --all --require-approval never
