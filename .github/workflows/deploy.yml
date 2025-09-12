@@ -14,9 +14,6 @@ permissions:
 
 jobs:
   deploy:
-    defaults:
-      run:
-        working-directory: ./cdk
     runs-on: ubuntu-latest
     environment: 
       name: prod
@@ -30,11 +27,10 @@ jobs:
       - name: Install CDK app deps
         run: |
           npm ci
-          
-
+        
       - name: Build Layers
         run: |
-          pushd ../layers/common
+          pushd ./layers/common
           npm install
           npm run build
           printf "*\n!nodejs/**\n" > .npmignore
@@ -42,9 +38,9 @@ jobs:
       - name: Build Lambdas
         run: |
     
-          cd lambdas/getQuiz && npm install && npm run build && cd ../..
-          cd lambdas/createQuiz && npm install && npm run build && cd ../..
-          cd lambdas/distributeQuiz && npm install && npm run build && cd ../..
+          cd ./lambdas/getQuiz && npm install && npm run build && cd ../..
+          cd ./lambdas/createQuiz && npm install && npm run build && cd ../..
+          cd ./lambdas/distributeQuiz && npm install && npm run build && cd ../..
 
       - name: Set STAGE
         run: |
