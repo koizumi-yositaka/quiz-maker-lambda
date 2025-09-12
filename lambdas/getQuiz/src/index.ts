@@ -11,6 +11,7 @@ import mysql from 'mysql2/promise';
 type RequestBody = {
     quizId: string;
     email: string;
+    password: string;
 }
 
 export const handler:Handler = wrap(async(event)=>{

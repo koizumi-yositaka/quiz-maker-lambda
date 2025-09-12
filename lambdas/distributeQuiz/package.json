@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "build:cdk": "tsc && cp -r node_modules dist/"
   },
   "keywords": [],
   "author": "",

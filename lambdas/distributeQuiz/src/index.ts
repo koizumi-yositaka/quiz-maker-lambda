@@ -1,11 +1,9 @@
 import { Handler } from 'aws-lambda';
-import { sysConst } from '@app/common/sysConst';
 import { ok, wrap } from '@app/common/ifWrapper/http';
 import { badRequest, notFound } from '@app/common/errors';
 import { s3 } from '@app/common/s3';
 import { isHttpError, internal } from '@app/common/errors';
 import { S3Client } from '@aws-sdk/client-s3';
-import { TPageDesign } from '@app/common/types';
 import mysql from 'mysql2/promise';
 import { ses } from '@app/common/ses';
 
@@ -44,9 +42,9 @@ export const handler:Handler = wrap(async(event)=>{
 
 
         console.log("targets",body.targets);
-        for(const email of body.targets){
-            await ses.sendEmail([email], 'Quiz Distributed', `http://localhost:5500/login?preQuizId=${body.quizId}&preEmail=${email}`);
-        }
+        // for(const email of body.targets){
+        //     await ses.sendEmail([email], 'Quiz Distributed', `http://localhost:5500/login?preQuizId=${body.quizId}&preEmail=${email}`);
+        // }
 
 
         const newEmails = body.targets.filter((email) => !emails.includes(email));
@@ -54,7 +52,7 @@ export const handler:Handler = wrap(async(event)=>{
         // 新しいemailを追加
         await conn.query('insert into t_quiz_distribution (quiz_id, email) values ?', [values]);
 
-        return ok({ fileKey: `${body.quizId}` });
+        return ok({ fileKey: `${body.quizId}`,newEmails:newEmails });
     } catch (err) {
         if(isHttpError(err)){
             throw err;
