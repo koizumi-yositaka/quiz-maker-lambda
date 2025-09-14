@@ -33,7 +33,7 @@ my-project/
    docker-compose up
 
    sam build
-   sam local start-api --docker-network workflow-net
+   export AWS_PROFILE=escco && sam local start-api --docker-network workflow-net
 
 2. mysql への接続
    docker exec -it mysql bash
@@ -70,6 +70,7 @@ my-project/
 # Layer の注意
 
 cd layers/common
+npm i
 npm run build
 
 をしないと、修正が反映されない。

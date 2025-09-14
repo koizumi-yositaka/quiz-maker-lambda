@@ -9,7 +9,7 @@ import { TPageDesign } from '@app/common/types';
 import mysql from 'mysql2/promise';
 
 type RequestBody = {
-    userId: number;
+    userId: string;
     quizName: string;
     pageDesign: TPageDesign[];
 }

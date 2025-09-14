@@ -17,7 +17,6 @@ export type TInputContentDesign = {
 }
 
 export type TRadioOption = {
-    id: string;
     label: string;
     value: string;
 }

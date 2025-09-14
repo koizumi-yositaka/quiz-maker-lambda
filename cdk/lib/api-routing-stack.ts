@@ -109,7 +109,7 @@ export class ApiRoutingStack extends cdk.Stack {
     });
 
 
-    const api = new apigateway.RestApi(this, `${PREFIX}-api`, {
+    const api = new apigateway.RestApi(this, `${PREFIX}-api-${props.stage}`, {
       deployOptions: {
         stageName: props.stage,
       },
