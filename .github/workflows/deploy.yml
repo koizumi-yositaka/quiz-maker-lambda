@@ -31,6 +31,8 @@ jobs:
       SUBNET_ID: subnet-841b2ec9
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -78,11 +80,27 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
+      - name: Check changes in lambdas/generateQuiz
+        id: gen_changed
+        run: |
+          set -e
+          BASE_REF="${{ github.event_name == 'push' && github.event.before || format('origin/{0}', github.base_ref) }}"
+          if [ "${{ github.event_name }}" != "push" ]; then
+            git fetch origin ${{ github.base_ref }} --depth=1
+          fi
+          if git diff --quiet "$BASE_REF" "${{ github.sha }}" -- lambdas/generateQuiz; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Login to Amazon ECR
+        if: steps.gen_changed.outputs.changed == 'true'
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 260337063361.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - name: Build and Push generateQuiz Lambda image
+        if: steps.gen_changed.outputs.changed == 'true'
         run: |
           IMAGE_TAG=${GITHUB_SHA::7}
           echo "Building image with tag: $IMAGE_TAG"

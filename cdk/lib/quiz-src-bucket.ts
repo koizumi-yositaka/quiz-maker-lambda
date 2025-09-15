@@ -18,6 +18,7 @@ export class QuizSrcBucket extends cdk.Stack {
         bucketName: `${PREFIX}-${props.stage}`,
         removalPolicy: cdk.RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
+        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
         publicReadAccess: true,
     })
     this.bucket = siteBucket;
