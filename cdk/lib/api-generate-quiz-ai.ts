@@ -47,7 +47,7 @@ export class ApiGenerateQuizAiStack extends cdk.Stack {
 
     const generateQuiz = api.root.addResource('generateQuiz');
     generateQuiz.addMethod('POST', new apigateway.LambdaIntegration(generateQuizLambda),{
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+      authorizationType: apigateway.AuthorizationType.NONE,
     });
 
     props.s3Bucket.grantRead(generateQuizLambda);
