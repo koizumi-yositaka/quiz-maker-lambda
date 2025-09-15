@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 # ==== 型定義 ====
 class TRadioOption(BaseModel):
     label: str = Field(..., description="選択肢の表示ラベル（日本語）")
-    value: str = Field(..., description="選択肢の内部値（英語キー）")
+    value: str = Field(..., description="選択肢の内部値（英語）")
 
 class TInputContentDesign(BaseModel):
     q: str
