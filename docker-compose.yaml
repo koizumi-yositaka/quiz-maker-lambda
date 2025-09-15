@@ -20,5 +20,24 @@ services:
       - ./sql:/docker-entrypoint-initdb.d
     networks:
       - workflow-net
+
+  quiz-generator-api:
+    build:
+      context: ./lambdas/generateQuiz/src
+      dockerfile: Dockerfile.dev
+    container_name: quiz-generator-api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=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
+      - AWS_PROFILE=escco
+    volumes:
+      - ./lambdas/generateQuiz/src:/app
+      - ./lambdas/generateQuiz/app:/app/app
+      - ~/.aws:/root/.aws:ro
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - workflow-net
 volumes:
   mysql-data:

@@ -20,6 +20,7 @@ jobs:
     env:
       AWS_ACCOUNT: 260337063361
       AWS_REGION: us-east-1
+      ECR_REPO: 260337063361.dkr.ecr.us-east-1.amazonaws.com/generate-quiz-ai-ecr
       DB_HOST: db-cluster-mmh.cluster-cmjvlwsjoinn.us-east-1.rds.amazonaws.com
       DB_NAME: mw_db
       DB_USER: admin
@@ -76,6 +77,17 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 260337063361.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build and Push generateQuiz Lambda image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          echo "Building image with tag: $IMAGE_TAG"
+          docker build -t generate-quiz-ai:latest -t $ECR_REPO:$IMAGE_TAG ./lambdas/generateQuiz
+          docker push $ECR_REPO:$IMAGE_TAG
 
       - name: CDK Diff
         if: github.event_name == 'pull_request'

@@ -18,3 +18,5 @@ cdk/cdk.out/
 .env
 
 .aws-sam/
+
+__pycache__/
