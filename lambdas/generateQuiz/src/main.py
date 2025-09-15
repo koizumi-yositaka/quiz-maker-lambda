@@ -14,7 +14,6 @@ from common.quiz_generator import generate_quiz
 # ==== リクエストボディ ====
 
 class GenerateQuizRequest(BaseModel):
-    bucket: str
     key: str
     num_questions: int = 3
 
@@ -64,7 +63,7 @@ async def generate_quiz_endpoint(request: GenerateQuizRequest):
     """クイズ生成エンドポイント"""
     try:
         # S3からドキュメントを読み込み
-        text = load_md_from_s3_with_error_handling(request.bucket, request.key)
+        text = load_md_from_s3_with_error_handling(os.environ.get("S3_BUCKET"), request.key)
         
         # クイズを生成
         quiz = generate_quiz_with_error_handling(text, num_questions=request.num_questions)
