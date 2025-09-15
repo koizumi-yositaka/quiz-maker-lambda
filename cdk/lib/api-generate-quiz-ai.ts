@@ -9,11 +9,14 @@ import * as ecr from 'aws-cdk-lib/aws-ecr';
 const REPOSITORY_TOP=path.join(__dirname,"../");
 const PREFIX = "quiz-ky-bucket"
 
-
+interface ApiGenerateQuizAiStackProps extends cdk.StackProps {
+  stage: string;
+  s3Bucket: s3.Bucket;
+  imageTag?: string;
+}
 
 export class ApiGenerateQuizAiStack extends cdk.Stack {
-  public readonly bucket: s3.Bucket;
-  constructor(scope: Construct, id: string, props: cdk.StackProps & { stage: string; imageTag?: string }) {
+  constructor(scope: Construct, id: string, props: ApiGenerateQuizAiStackProps) {
     super(scope, id, props);
     const api = new apigateway.RestApi(this, `${PREFIX}-api-${props.stage}`, {
       deployOptions: {
@@ -37,12 +40,17 @@ export class ApiGenerateQuizAiStack extends cdk.Stack {
       memorySize: 512,
       timeout: cdk.Duration.seconds(60),
       functionName: `${PREFIX}-generate-quiz-${props.stage}`,
+      environment: {
+        S3_BUCKET: props.s3Bucket.bucketName,
+      },
     });
 
     const generateQuiz = api.root.addResource('generateQuiz');
     generateQuiz.addMethod('POST', new apigateway.LambdaIntegration(generateQuizLambda),{
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
+
+    props.s3Bucket.grantRead(generateQuizLambda);
 
     new cdk.CfnOutput(this, `${PREFIX}-api-url-${props.stage}`, {
       value: api.url,

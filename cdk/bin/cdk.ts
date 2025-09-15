@@ -3,6 +3,8 @@ import * as cdk from 'aws-cdk-lib';
 import { ApiRoutingStack } from '../lib/api-routing-stack';
 import { S3BucketStack } from '../lib/s3-bucket-stack';
 import 'dotenv/config'
+import { ApiGenerateQuizAiStack } from '../lib/api-generate-quiz-ai';
+import { QuizSrcBucket } from '../lib/quiz-src-bucket';
 
 const stage = process.env.STAGE || 'dev';
 const app = new cdk.App();
@@ -18,6 +20,12 @@ const env = {
 
 // S3BucketStackを独立したスタックとして作成
 const s3BucketStack = new S3BucketStack(app, `${stage}-S3BucketStack`, {
+  stage,
+  env,
+});
+
+// QuizSrcBucketを独立したスタックとして作成
+const quizSrcBucket = new QuizSrcBucket(app, `${stage}-QuizSrcBucket`, {
   stage,
   env,
 });
@@ -38,3 +46,12 @@ const apiRoutingStack = new ApiRoutingStack(app, `${stage}-ApiRoutingStack`, {
 
 // スタック間の依存関係を設定
 apiRoutingStack.addDependency(s3BucketStack);
+
+// ApiGenerateQuizAiStackを独立したスタックとして作成
+const apiGenerateQuizAiStack = new ApiGenerateQuizAiStack(app, `${stage}-ApiGenerateQuizAiStack`, {
+  stage,
+  imageTag: process.env.IMAGE_TAG,
+  s3Bucket: quizSrcBucket.bucket,
+  env
+});
+
