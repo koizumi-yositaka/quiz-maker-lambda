@@ -62,6 +62,8 @@ async def root():
 async def generate_quiz_endpoint(request: GenerateQuizRequest):
     """クイズ生成エンドポイント"""
     try:
+        if not os.environ.get("S3_BUCKET"):
+            raise HTTPException(status_code=400, detail="S3_BUCKET environment variable is not set")
         # S3からドキュメントを読み込み
         text = load_md_from_s3_with_error_handling(os.environ.get("S3_BUCKET"), request.key)
         
