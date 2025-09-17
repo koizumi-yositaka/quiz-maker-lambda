@@ -7,10 +7,11 @@ from common.quiz_generator import generate_quiz
 def lambda_handler(event, context):
     try:
         body = json.loads(event.get("body", "{}"))
-        bucket = body.get("bucket", os.environ.get("BUCKET_NAME"))
-        key = body.get("key", os.environ.get("FILE_KEY"))
+        bucket = os.environ.get("S3_BUCKET")
+        key = body.get("key")
         num_questions = int(body.get("num_questions", 3))
-
+        if not bucket or not key:
+            raise Exception("S3_BUCKET and key are required")
         text = load_md_from_s3(bucket, key)
         quiz = generate_quiz(text, num_questions=num_questions)
 
