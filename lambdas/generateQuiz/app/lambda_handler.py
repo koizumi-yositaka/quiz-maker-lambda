@@ -6,13 +6,13 @@ from common.quiz_generator import generate_quiz
 # ==== Lambda Handler (API Gateway) ====
 def lambda_handler(event, context):
     try:
-        print("Received event:", json.dumps({
-            "httpMethod": event.get("httpMethod"),
-            "path": event.get("path"),
-            "headers": {k: v for k, v in (event.get("headers") or {}).items() if k.lower() in ["origin", "content-type"]},
-            "hasBody": event.get("body") is not None,
-            "isBase64Encoded": event.get("isBase64Encoded")
-        }))
+        # OPTIONSリクエスト（プリフライト）の処理
+        if event.get("httpMethod") == "OPTIONS":
+            return {
+                "statusCode": 200,
+                "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"message": "OPTIONS request received"})
+            }
 
         raw_body = event.get("body")
         if raw_body is None:

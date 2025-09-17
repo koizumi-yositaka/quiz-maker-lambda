@@ -22,6 +22,15 @@ const corsHeaders = {
 export const handler:Handler = wrap(async(event)=>{
     let conn;
     try{
+        // OPTIONSリクエスト（プリフライト）の処理
+        if (event.httpMethod === 'OPTIONS') {
+            console.log("Handling OPTIONS request");
+            return {
+            statusCode: 200,
+            headers: corsHeaders,
+            body: ''
+            };
+        }
         if(!process.env.MYSQL_HOST || !process.env.MYSQL_USER || !process.env.MYSQL_PASSWORD || !process.env.MYSQL_DATABASE){
             throw internal("Missing required environment variables");
         }
