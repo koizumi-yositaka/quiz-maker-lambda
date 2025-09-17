@@ -19,11 +19,12 @@ export const handler:Handler = async (event) => {
         // OPTIONSリクエスト（プリフライト）の処理
         if (event.httpMethod === 'OPTIONS') {
           console.log("Handling OPTIONS request");
-          return {
+          resolve({
             statusCode: 200,
             headers: corsHeaders,
             body: ''
-          };
+          });
+          return;
         }
         const bucketName = process.env.S3_BUCKET
         if (!bucketName) {
