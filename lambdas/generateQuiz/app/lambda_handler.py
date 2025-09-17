@@ -3,6 +3,14 @@ import json
 from common.s3_client import load_md_from_s3
 from common.quiz_generator import generate_quiz
 
+# CORS headers for all responses
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+    "Access-Control-Allow-Credentials": "false"
+}
+
 # ==== Lambda Handler (API Gateway) ====
 def lambda_handler(event, context):
     try:
@@ -10,8 +18,8 @@ def lambda_handler(event, context):
         if event.get("httpMethod") == "OPTIONS":
             return {
                 "statusCode": 200,
-                "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-                "body": json.dumps({"message": "OPTIONS request received"})
+                "headers": CORS_HEADERS,
+                "body": ""
             }
 
         raw_body = event.get("body")
@@ -34,7 +42,7 @@ def lambda_handler(event, context):
             print("Missing S3_BUCKET env var")
             return {
                 "statusCode": 500,
-                "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+                "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
                 "body": json.dumps({"error": "S3_BUCKET is not set"})
             }
 
@@ -42,7 +50,7 @@ def lambda_handler(event, context):
             print("Missing 'key' in request body or query")
             return {
                 "statusCode": 400,
-                "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+                "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
                 "body": json.dumps({"error": "'key' is required in body or query"})
             }
 
@@ -52,7 +60,7 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
-            "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+            "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
             "body": json.dumps([q.dict() for q in quiz], ensure_ascii=False)
         }
 
@@ -60,6 +68,6 @@ def lambda_handler(event, context):
         print("Error while generating quiz:", str(e))
         return {
             "statusCode": 500,
-            "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+            "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
             "body": json.dumps({"error": str(e)})
         }
