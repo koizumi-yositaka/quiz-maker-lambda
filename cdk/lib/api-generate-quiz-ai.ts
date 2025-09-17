@@ -45,9 +45,12 @@ export class ApiGenerateQuizAiStack extends cdk.Stack {
         OPEN_API_KEY: process.env.OPEN_API_KEY || '',
       },
     });
-
+    
     const generateQuiz = api.root.addResource('generateQuiz');
     generateQuiz.addMethod('POST', new apigateway.LambdaIntegration(generateQuizLambda),{
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+    generateQuiz.addMethod('OPTIONS', new apigateway.LambdaIntegration(generateQuizLambda),{
       authorizationType: apigateway.AuthorizationType.NONE,
     });
 
