@@ -13,7 +13,12 @@ type RequestBody = {
     quizName: string;
     pageDesign: TPageDesign[];
 }
-
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Access-Control-Allow-Credentials': 'false' 
+  };
 export const handler:Handler = wrap(async(event)=>{
     let conn;
     try{
@@ -61,7 +66,7 @@ export const handler:Handler = wrap(async(event)=>{
             throw internal('Failed to save quiz to database', dbError);
         }
 
-        return ok({ fileKey: quiz_id });
+        return ok({ fileKey: quiz_id }, corsHeaders);
     } finally {
         if(conn){
             await conn.end();

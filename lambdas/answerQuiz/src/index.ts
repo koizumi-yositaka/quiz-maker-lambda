@@ -14,7 +14,12 @@ type RequestBody = {
     quizId: string;
     answer: Record<string, string>;
 }
-
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+    'Access-Control-Allow-Credentials': 'false' 
+  };
 export const handler:Handler = wrap(async(event)=>{
     let conn;
     try{
@@ -35,7 +40,7 @@ export const handler:Handler = wrap(async(event)=>{
         const {quizId, answer,answeredUserId} = body;
         const quizBucket = process.env.S3_BUCKET ?? '';
         if (quizBucket === '') {    
-            throw badRequest('S3_BUCKET is not set');
+            throw badRequest('S3_BUCKET is not set', corsHeaders);
         }
         const s3Client = new S3Client({
             region: 'us-east-1'
@@ -85,7 +90,7 @@ export const handler:Handler = wrap(async(event)=>{
         // 回答を保存
         await conn.query('insert into t_quiz_response (quiz_id, respondent_email, version, score) values (?, ?, ?, ?)', [body.quizId, body.answeredUserId, newVersion, score]);
 
-        return ok({result, score, totalQ});
+        return ok({result, score, totalQ}, corsHeaders);
     } finally {
         if(conn){
             await conn.end();

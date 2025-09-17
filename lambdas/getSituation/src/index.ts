@@ -1,7 +1,7 @@
 import { Handler } from 'aws-lambda';
 
 import { ok, wrap } from '@app/common/ifWrapper/http';
-import { badRequest, notFound } from '@app/common/errors';
+import { badRequest, notFound, unauthorized } from '@app/common/errors';
 import { s3 } from '@app/common/s3';
 import { isHttpError, internal } from '@app/common/errors';
 import { S3Client } from '@aws-sdk/client-s3';
@@ -23,7 +23,12 @@ type QuizResponseSituation = {
     score: number;
     responseCreatedAt: string;
 }
-
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+    'Access-Control-Allow-Credentials': 'false' 
+  };
 export const handler:Handler = wrap(async(event)=>{
     let conn;
     try{
@@ -48,10 +53,7 @@ export const handler:Handler = wrap(async(event)=>{
         }
         if (!authorizer) {
           console.error("No authorizer found");
-          return {
-            statusCode: 401,
-            body: JSON.stringify({ message: "Unauthorized" })
-          };
+          throw unauthorized("Unauthorized");
         }
     
         // Cognito認証の場合、ユーザー情報はauthorizer.claimsに含まれる
@@ -59,7 +61,6 @@ export const handler:Handler = wrap(async(event)=>{
         const username = claims['cognito:username'];
         const email = event.pathParameters?.email || '';
         const quizId = event.pathParameters?.quizId || '';
-        console.log("username", username);
         let sql = `
         SELECT 
             q.quiz_id as quizId,
@@ -118,7 +119,7 @@ export const handler:Handler = wrap(async(event)=>{
 
         const result = Array.from(quizMap.values());
 
-        return ok({result});
+        return ok({result}, corsHeaders);
     } finally {
         if(conn){
             await conn.end();

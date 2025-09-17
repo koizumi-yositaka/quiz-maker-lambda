@@ -11,7 +11,12 @@ type RequestBody = {
     quizId: string;
     targets: string[];
 }
-
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Access-Control-Allow-Credentials': 'false' 
+  };
 export const handler:Handler = wrap(async(event)=>{
     let conn;
     try{
@@ -52,7 +57,7 @@ export const handler:Handler = wrap(async(event)=>{
         // 新しいemailを追加
         await conn.query('insert into t_quiz_distribution (quiz_id, email) values ?', [values]);
 
-        return ok({ fileKey: `${body.quizId}`,newEmails:newEmails });
+        return ok({ fileKey: `${body.quizId}`,newEmails:newEmails }, corsHeaders);
     } finally {
         if(conn){
             await conn.end();
