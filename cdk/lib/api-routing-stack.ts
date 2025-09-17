@@ -113,6 +113,10 @@ export class ApiRoutingStack extends cdk.Stack {
       ...commonLambdaSetting,
       functionName: `${PREFIX}-upload-quiz-src-${props.stage}`,
       code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/uploadQuizSrc/dist')),
+      environment: {
+        ...commonLambdaSetting.environment,
+        S3_BUCKET: props.s3QuizSrcBucket.bucketName,
+      },
     });
     const api = new apigateway.RestApi(this, `${PREFIX}-api-${props.stage}`, {
       deployOptions: {
