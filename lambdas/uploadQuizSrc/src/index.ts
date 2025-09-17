@@ -1,22 +1,27 @@
-import { Handler } from 'aws-lambda';
-import { sysConst } from '@app/common/sysConst';
-import { ok, wrap } from '@app/common/ifWrapper/http';
-import { badRequest } from '@app/common/errors';
-import { s3 } from '@app/common/s3';
+import { APIGatewayProxyEvent, Handler } from 'aws-lambda';
 import { PutObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 import Busboy from 'busboy';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 const s3Client = new S3Client({
     region: 'us-east-1'
 });
+
+// 全オリジン許可のCORSヘッダー
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Access-Control-Allow-Credentials': 'false' 
+};
 export const handler:Handler = async (event) => {
     return new Promise((resolve, reject) => {
       try {
-        const bucketName = process.env.BUCKET_NAME || process.env.S3_BUCKET;
+        const bucketName = process.env.S3_BUCKET
         if (!bucketName) {
           console.error('Missing S3 bucket name. Set BUCKET_NAME or S3_BUCKET');
           resolve({
             statusCode: 500,
+            headers: corsHeaders,
             body: JSON.stringify({ error: 'Missing S3 bucket name. Set BUCKET_NAME or S3_BUCKET' }),
           });
           return;
@@ -70,13 +75,16 @@ export const handler:Handler = async (event) => {
             await uploadPromise;
             resolve({
               statusCode: 200,
+              headers: corsHeaders,
               body: JSON.stringify({
-                message: `File uploaded to s3://${bucketName}/${key}`,
+                message: `File uploaded successfully`,
+                key: key,
               }),
             });
           } else {
             reject({
               statusCode: 400,
+              headers: corsHeaders,
               body: JSON.stringify({ error: "No file received" }),
             });
           }
@@ -87,6 +95,7 @@ export const handler:Handler = async (event) => {
         console.error(err);
         reject({
           statusCode: 500,
+          headers: corsHeaders,
           body: JSON.stringify({ error: "File upload failed" }),
         });
       }

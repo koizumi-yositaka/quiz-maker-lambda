@@ -58,7 +58,7 @@ async def root():
     """ヘルスチェック"""
     return {"message": "Quiz Generator API is running"}
 
-@app.post("/generate-quiz")
+@app.post("/generateQuiz")
 async def generate_quiz_endpoint(request: GenerateQuizRequest):
     """クイズ生成エンドポイント"""
     try:

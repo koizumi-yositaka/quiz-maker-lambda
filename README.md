@@ -28,9 +28,9 @@ my-project/
 # local 起動時
 
 1. 起動
-
    docker-compose build
    docker-compose up
+
 
    sam build
    export AWS_PROFILE=escco && sam local start-api --docker-network workflow-net

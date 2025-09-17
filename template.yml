@@ -224,7 +224,7 @@ Resources:
       Runtime: nodejs22.x
       Environment:
         Variables:
-          BUCKET_NAME: quiz-src-bucket-ky-dev
+          S3_BUCKET: quiz-src-bucket-ky-dev
       Events:
         ApiEvent:
           Type: Api

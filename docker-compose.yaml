@@ -30,8 +30,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENAI_API_KEY=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
+      - OPENAI_API_KEY=${OPEN_API_KEY}
       - AWS_PROFILE=escco
+      - S3_BUCKET=quiz-src-bucket-ky-dev
+    env_file:
+      - .env
     volumes:
       - ./lambdas/generateQuiz/src:/app
       - ./lambdas/generateQuiz/app:/app/app

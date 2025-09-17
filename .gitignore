@@ -16,6 +16,7 @@ cdk/cdk.out/
 
 # dotenv
 .env
+.env.local
 
 .aws-sam/
 

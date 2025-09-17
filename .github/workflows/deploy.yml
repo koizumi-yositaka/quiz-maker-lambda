@@ -29,7 +29,7 @@ jobs:
       LAMBDA_SG_ID: sg-05d40a37b9b87defd
       USER_POOL_ID: us-east-1_gx1b4cmF7
       SUBNET_ID: subnet-841b2ec9
-      OPENAI_API_KEY: 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
+      OPENAI_API_KEY: ${{ secrets.OPEN_API_KEY }}
     steps:
       - uses: actions/checkout@v3
         with:
