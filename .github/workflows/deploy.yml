@@ -29,7 +29,7 @@ jobs:
       LAMBDA_SG_ID: sg-05d40a37b9b87defd
       USER_POOL_ID: us-east-1_gx1b4cmF7
       SUBNET_ID: subnet-841b2ec9
-      OPENAI_API_KEY: ${{ secrets.OPEN_API_KEY }}
+      OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
       S3_BUCKET: quiz-src-bucket-ky-dev
     steps:
       - uses: actions/checkout@v3
@@ -101,16 +101,16 @@ jobs:
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 260337063361.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: Set IMAGE_TAG=latest for deployment
+      - name: Set IMAGE_TAG to commit SHA
         run: |
-          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
 
-      - name: Build and Push generateQuiz Lambda image
+      - name: Build and Push generateQuiz Lambda image (immutable tag)
         if: steps.gen_changed.outputs.changed == 'true'
         run: |
-          echo "Building image with tag: latest"
-          docker build -t $ECR_REPO:latest ./lambdas/generateQuiz
-          docker push $ECR_REPO:latest
+          echo "Building image with tag: ${IMAGE_TAG}"
+          docker build -t $ECR_REPO:${IMAGE_TAG} ./lambdas/generateQuiz
+          docker push $ECR_REPO:${IMAGE_TAG}
 
       - name: CDK Diff
         if: github.event_name == 'pull_request'

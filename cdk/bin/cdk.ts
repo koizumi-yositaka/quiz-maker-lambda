@@ -51,6 +51,7 @@ apiRoutingStack.addDependency(s3BucketStack);
 const apiGenerateQuizAiStack = new ApiGenerateQuizAiStack(app, `${stage}-ApiGenerateQuizAiStack`, {
   stage,
   s3Bucket: quizSrcBucket.bucket,
+  imageTag: process.env.IMAGE_TAG,
   env
 });
 

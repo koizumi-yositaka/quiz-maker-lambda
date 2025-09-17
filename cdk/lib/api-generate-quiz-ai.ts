@@ -12,6 +12,7 @@ const PREFIX = "quiz-ky-bucket"
 interface ApiGenerateQuizAiStackProps extends cdk.StackProps {
   stage: string;
   s3Bucket: s3.Bucket;
+  imageTag?: string;
 }
 
 export class ApiGenerateQuizAiStack extends cdk.Stack {
@@ -31,7 +32,7 @@ export class ApiGenerateQuizAiStack extends cdk.Stack {
     );
 
     const imageCode = lambda.DockerImageCode.fromEcr(repository, {
-      tagOrDigest: 'latest',
+      tagOrDigest: props.imageTag ?? 'latest',
     });
 
     const generateQuizLambda = new lambda.DockerImageFunction(this, 'GenerateQuizLambda', {
