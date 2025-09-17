@@ -12,6 +12,8 @@ def lambda_handler(event, context):
         num_questions = int(body.get("num_questions", 3))
         if not bucket or not key:
             raise Exception("S3_BUCKET and key are required")
+        print("bucket", bucket)
+        print("key", key)
         text = load_md_from_s3(bucket, key)
         quiz = generate_quiz(text, num_questions=num_questions)
 
