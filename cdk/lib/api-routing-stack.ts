@@ -120,18 +120,20 @@ export class ApiRoutingStack extends cdk.Stack {
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
-
+    test.addMethod('OPTIONS', new apigateway.LambdaIntegration(getQuizLambda))
     const createQuiz = api.root.addResource('createQuiz');
     createQuiz.addMethod('POST', new apigateway.LambdaIntegration(createQuizLambda),{
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
+    createQuiz.addMethod('OPTIONS', new apigateway.LambdaIntegration(createQuizLambda))
 
     const distributeQuiz = api.root.addResource('distribute');
     distributeQuiz.addMethod('POST', new apigateway.LambdaIntegration(distributeQuizLambda),{
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
+    distributeQuiz.addMethod('OPTIONS', new apigateway.LambdaIntegration(distributeQuizLambda))
 
     const answerQuiz = api.root.addResource('answerQuiz');
     answerQuiz.addMethod('POST', new apigateway.LambdaIntegration(answerQuizLambda),{
@@ -139,11 +141,14 @@ export class ApiRoutingStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    answerQuiz.addMethod('OPTIONS', new apigateway.LambdaIntegration(answerQuizLambda))
     const getSituation = api.root.addResource('getSituation');
     getSituation.addMethod('GET', new apigateway.LambdaIntegration(getSituationLambda),{
       authorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
+
+    getSituation.addMethod('OPTIONS', new apigateway.LambdaIntegration(getSituationLambda))
 
     props.s3Bucket.grantRead(getQuizLambda);
     props.s3Bucket.grantWrite(createQuizLambda);

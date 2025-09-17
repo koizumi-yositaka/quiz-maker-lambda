@@ -88,7 +88,7 @@ export const handler:Handler = wrap(async(event)=>{
         }
 
         const [rows] = await conn.query(sql, params);
-
+        console.log("rows", rows);
         // SQLの結果をQuizSituation型に変換
         const quizMap = new Map<string, QuizSituation>();
         
