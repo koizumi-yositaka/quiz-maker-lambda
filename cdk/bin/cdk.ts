@@ -50,7 +50,7 @@ apiRoutingStack.addDependency(s3BucketStack);
 // ApiGenerateQuizAiStackを独立したスタックとして作成
 const apiGenerateQuizAiStack = new ApiGenerateQuizAiStack(app, `${stage}-ApiGenerateQuizAiStack`, {
   stage,
-  imageTag: process.env.IMAGE_TAG,
+  imageTag: 'latest',
   s3Bucket: quizSrcBucket.bucket,
   env
 });
