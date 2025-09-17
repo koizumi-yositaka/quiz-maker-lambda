@@ -30,6 +30,7 @@ jobs:
       USER_POOL_ID: us-east-1_gx1b4cmF7
       SUBNET_ID: subnet-841b2ec9
       OPENAI_API_KEY: ${{ secrets.OPEN_API_KEY }}
+      S3_BUCKET: quiz-src-bucket-ky-dev
     steps:
       - uses: actions/checkout@v3
         with:
