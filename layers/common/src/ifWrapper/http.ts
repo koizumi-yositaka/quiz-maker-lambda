@@ -6,7 +6,9 @@ const allowOrigin = process.env.ALLOW_ORIGIN ?? '*';
 const baseHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': allowOrigin,
-  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Access-Control-Allow-Credentials': 'false',
 };
 
 export const json = (statusCode: number, body: unknown, headers: Record<string, string> = {}): APIGatewayProxyResult => ({
