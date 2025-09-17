@@ -14,17 +14,17 @@ const corsHeaders = {
   'Access-Control-Allow-Credentials': 'false' 
 };
 export const handler:Handler = async (event) => {
-  // OPTIONSリクエスト（プリフライト）の処理
-  if (event.httpMethod === 'OPTIONS') {
-    console.log("Handling OPTIONS request");
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: ''
-    };
-  }
     return new Promise((resolve, reject) => {
       try {
+        // OPTIONSリクエスト（プリフライト）の処理
+        if (event.httpMethod === 'OPTIONS') {
+          console.log("Handling OPTIONS request");
+          return {
+            statusCode: 200,
+            headers: corsHeaders,
+            body: ''
+          };
+        }
         const bucketName = process.env.S3_BUCKET
         if (!bucketName) {
           console.error('Missing S3 bucket name. Set BUCKET_NAME or S3_BUCKET');

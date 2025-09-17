@@ -41,6 +41,7 @@ const apiRoutingStack = new ApiRoutingStack(app, `${stage}-ApiRoutingStack`, {
   LAMBDA_SG_ID: process.env.LAMBDA_SG_ID,
   SUBNET_ID: process.env.SUBNET_ID,
   s3Bucket: s3BucketStack.bucket,
+  s3QuizSrcBucket: quizSrcBucket.bucket,
   env,
 });
 

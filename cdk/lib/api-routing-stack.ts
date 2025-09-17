@@ -19,6 +19,7 @@ interface ApiRoutingStackProps extends cdk.StackProps {
   LAMBDA_SG_ID: string;
   SUBNET_ID:string;
   s3Bucket: s3.Bucket;
+  s3QuizSrcBucket: s3.Bucket;
 }
 export class ApiRoutingStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ApiRoutingStackProps) {
@@ -108,7 +109,11 @@ export class ApiRoutingStack extends cdk.Stack {
       authorizerName: `esc-api-authorizer-${props.stage}`,
     });
 
-
+    const uploadQuizSrcLambda = new lambda.Function(this, 'UploadQuizSrcLambda', {
+      ...commonLambdaSetting,
+      functionName: `${PREFIX}-upload-quiz-src-${props.stage}`,
+      code: lambda.Code.fromAsset(path.join(REPOSITORY_TOP, 'lambdas/uploadQuizSrc/dist')),
+    });
     const api = new apigateway.RestApi(this, `${PREFIX}-api-${props.stage}`, {
       deployOptions: {
         stageName: props.stage,
@@ -142,6 +147,7 @@ export class ApiRoutingStack extends cdk.Stack {
     });
 
     answerQuiz.addMethod('OPTIONS', new apigateway.LambdaIntegration(answerQuizLambda))
+
     const getSituation = api.root.addResource('getSituation');
     getSituation.addMethod('GET', new apigateway.LambdaIntegration(getSituationLambda),{
       authorizer,
@@ -156,6 +162,14 @@ export class ApiRoutingStack extends cdk.Stack {
     props.s3Bucket.grantWrite(distributeQuizLambda);
     props.s3Bucket.grantRead(answerQuizLambda);
     props.s3Bucket.grantRead(getSituationLambda);
+
+    const uploadQuizSrc = api.root.addResource('uploadQuizSrc');
+    uploadQuizSrc.addMethod('POST', new apigateway.LambdaIntegration(uploadQuizSrcLambda),{
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    uploadQuizSrc.addMethod('OPTIONS', new apigateway.LambdaIntegration(uploadQuizSrcLambda))
+    props.s3QuizSrcBucket.grantWrite(uploadQuizSrcLambda);
 
     new cdk.CfnOutput(this, `${PREFIX}-api-url-${props.stage}`, {
       value: api.url,
