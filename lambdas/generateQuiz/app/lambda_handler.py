@@ -14,6 +14,7 @@ CORS_HEADERS = {
 # ==== Lambda Handler (API Gateway) ====
 def lambda_handler(event, context):
     try:
+        print("Received event:", json.dumps(event))
         # OPTIONSリクエスト（プリフライト）の処理
         if event.get("httpMethod") == "OPTIONS":
             return {
