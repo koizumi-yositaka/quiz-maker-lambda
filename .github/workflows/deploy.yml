@@ -59,6 +59,7 @@ jobs:
           cd ./lambdas/distributeQuiz && npm install && npm run build:cdk && cd ../..
           cd ./lambdas/answerQuiz && npm install && npm run build:cdk && cd ../..
           cd ./lambdas/getSituation && npm install && npm run build:cdk && cd ../..
+          cd ./lambdas/uploadQuizSrc && npm install && npm run build:cdk && cd ../..
 
       - name: Set STAGE
         run: |
