@@ -42,7 +42,7 @@ export class ApiGenerateQuizAiStack extends cdk.Stack {
       functionName: `${PREFIX}-generate-quiz-${props.stage}`,
       environment: {
         S3_BUCKET: props.s3Bucket.bucketName,
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
+        OPEN_API_KEY: process.env.OPEN_API_KEY || '',
       },
     });
 

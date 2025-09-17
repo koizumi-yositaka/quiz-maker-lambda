@@ -25,7 +25,7 @@ def generate_quiz(document_text: str, num_questions: int = 3, openai_api_key: st
     """LangChain + ChatOpenAI でクイズを生成する"""
     try:
         load_dotenv()
-        api_key = openai_api_key or os.getenv("OPENAI_API_KEY") or os.getenv("OPEN_API_KEY")
+        api_key = openai_api_key or os.getenv("OPEN_API_KEY")
         if not api_key:
             raise Exception("OpenAI APIキーが設定されていません")
 
