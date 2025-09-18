@@ -56,6 +56,8 @@ export const handler:Handler = wrap(async(event)=>{
 
 
         console.log("targets",body.targets);
+        console.log("emails",emails);
+        console.log("quizDistribution",quizDistribution);
         // for(const email of body.targets){
         //     await ses.sendEmail([email], 'Quiz Distributed', `http://localhost:5500/login?preQuizId=${body.quizId}&preEmail=${email}`);
         // }
