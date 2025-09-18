@@ -52,15 +52,7 @@ export const handler:Handler = wrap(async(event)=>{
         }
         // 既存のemailを取得
         const [quizDistribution] = await conn.query('select email from t_quiz_distribution where quiz_id = ?', [body.quizId]);
-        const emails = quizDistribution as any[] as string[];
-
-
-        console.log("targets",body.targets);
-        console.log("emails",emails);
-        console.log("quizDistribution",quizDistribution);
-        // for(const email of body.targets){
-        //     await ses.sendEmail([email], 'Quiz Distributed', `http://localhost:5500/login?preQuizId=${body.quizId}&preEmail=${email}`);
-        // }
+        const emails = (quizDistribution as any[]).map((email) => email.email);
 
 
         const newEmails = body.targets.filter((email) => !emails.includes(email));
