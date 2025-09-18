@@ -39,6 +39,9 @@ export const handler:Handler = wrap(async(event)=>{
             database: process.env.MYSQL_DATABASE
         });
         const body: RequestBody = JSON.parse(event.body || "{}");
+        if (!body.quizId || !Array.isArray(body.targets)) {
+            throw badRequest('Invalid request body');
+        }
         const quizBucket = process.env.S3_BUCKET ?? '';
         if (quizBucket === '') {    
             throw badRequest('S3_BUCKET is not set');
@@ -56,9 +59,11 @@ export const handler:Handler = wrap(async(event)=>{
 
 
         const newEmails = body.targets.filter((email) => !emails.includes(email));
-        const values = newEmails.map(email => [body.quizId, email]);
-        // 新しいemailを追加
-        await conn.query('insert into t_quiz_distribution (quiz_id, email) values ?', [values]);
+        if (newEmails.length > 0) {
+            const values = newEmails.map(email => [body.quizId, email]);
+            // 新しいemailを追加（重複は無視）
+            await conn.query('insert ignore into t_quiz_distribution (quiz_id, email) values ?', [values]);
+        }
 
         return ok({ fileKey: `${body.quizId}`,newEmails:newEmails }, corsHeaders);
     } finally {
