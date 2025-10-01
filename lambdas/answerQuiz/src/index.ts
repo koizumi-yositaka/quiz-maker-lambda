@@ -67,7 +67,7 @@ export const handler:Handler = wrap(async(event)=>{
         let score = 0;
         pageDesign.forEach((page)=>{
             page.components.forEach((component)=>{
-                answerMap[component.id] = component.answer;
+                answerMap[component.content.name] = component.answer;
                 totalQ++;
             });
         });
